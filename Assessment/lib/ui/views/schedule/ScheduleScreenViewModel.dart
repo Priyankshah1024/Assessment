@@ -175,7 +175,9 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                         'Selected Date: ${dateController.text}',
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
+
                     const SizedBox(height: 10),
+
                     OutlinedButton(
                       onPressed: () async {
                         var selected = await _selectTime(context);
@@ -192,7 +194,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
-                            title: Text('Selected Date'),
+                            title: Text('Selected Time'),
                             content: Text('You have selected the time: ${selectedTime!.format(context)}'),
                             actions: <Widget>[
                               ElevatedButton(
@@ -252,7 +254,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                     final updatedSchedule = {
                       'id': schedule['id'],
                       'date': selectedDate!=null?selectedDate!.toLocal().toString().substring(0,10):dateController.text,
-                      'time': selectedTime!=null?selectedTime!.format(context):schedule['time'],
+                      'time': selectedTime!=null?selectedTime!.format(context):timeController.text,
                       'doc_name': docNameController.text,
                       'online_meeting': isOnlineMeetingEnabled?'1':'0',
                       'email_cc': emailCCController.text,
@@ -1180,7 +1182,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                             return GridView.builder(
                                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                                 crossAxisCount: 2,
-                                                childAspectRatio: 2,
+                                                childAspectRatio: 4.6,
                                               ),
                                               itemCount: (schedules.length < 6) ? schedules.length : 6,
                                               itemBuilder: (context, index) {
@@ -1311,7 +1313,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                             return GridView.builder(
                                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                                 crossAxisCount: 2,
-                                                childAspectRatio: 5,
+                                                childAspectRatio: 4.6,
                                               ),
                                               itemCount: (schedules.length-6).clamp(0, schedules.length-6),
                                               itemBuilder: (context, index) {
