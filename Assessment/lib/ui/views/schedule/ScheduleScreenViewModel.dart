@@ -1,13 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:stacked/stacked.dart';
-import 'package:stacked_services/stacked_services.dart';
-
-import '../../../app/locator.dart';
 
 class ScheduleScreenViewModel extends StatefulWidget {
   const ScheduleScreenViewModel({super.key});
@@ -22,7 +17,6 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
   final TextEditingController docNameController = TextEditingController();
   final TextEditingController onlineMeetingController = TextEditingController();
   final TextEditingController emailCCController = TextEditingController();
-  final DialogService _dialogService = locator<DialogService>();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   final List<String> onlineMeetingOptions = ['0', '1'];
@@ -683,166 +677,159 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                       final startIndex = pageIndex*3;
                                       final endIndex = (startIndex+3 < schedules.length) ? startIndex+3 : schedules.length;
                                       if (pageIndex<schedules.length && schedules.isNotEmpty) {
-                                        return CupertinoScrollbar(
-                                            controller: _scrollController,
-                                            thickness: 10,
-                                            radius: Radius.circular(10),
-                                            thicknessWhileDragging: 4,
-                                            radiusWhileDragging: Radius.circular(20),
-                                            child: GridView.builder(
-                                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: 1,
-                                                childAspectRatio: 3.9,
-                                              ),
-                                              controller: _scrollController,
-                                              itemCount: endIndex-startIndex,
-                                              itemBuilder: (context, index) {
-                                                final schedule = schedules[startIndex+index];
-                                                return Column(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    SingleChildScrollView(
-                                                      child: ListTile(
-                                                        leading: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Text('${schedule['date'].toString().substring(2,10)}',
-                                                                style: TextStyle(
-                                                                fontSize: 17,
-                                                                fontWeight: FontWeight.w500,
-                                                                color: Colors.grey[800],
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 3.5,),
-                                                            Text(
-                                                              selectedTime != null
-                                                                  ? '${schedule['time']}' : selectedTime != null
-                                                                  ? '${selectedTime!.format(context)}' : schedule['time'],
-                                                              style: TextStyle(
-                                                                fontSize: 17,
-                                                                fontWeight: FontWeight.w500,
-                                                                color: Colors.grey[800],
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        title: Container(
-                                                          padding: const EdgeInsets.only(bottom: 10),
-                                                          alignment: Alignment.topLeft,
-                                                          child: Text(
-                                                            schedule['doc_name'],
+                                        return GridView.builder(
+                                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 1,
+                                            childAspectRatio: 3.9,
+                                          ),
+                                          controller: _scrollController,
+                                          itemCount: endIndex-startIndex,
+                                          itemBuilder: (context, index) {
+                                            final schedule = schedules[startIndex+index];
+                                            return Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                SingleChildScrollView(
+                                                  child: ListTile(
+                                                    leading: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text('${schedule['date'].toString().substring(2,10)}',
                                                             style: TextStyle(
-                                                              fontSize: 19.5,
-                                                              fontWeight: FontWeight.w700,
-                                                              color: Colors.black87,
-                                                            ),
+                                                            fontSize: 17,
+                                                            fontWeight: FontWeight.w500,
+                                                            color: Colors.grey[800],
                                                           ),
                                                         ),
-                                                        subtitle: Container(
-                                                          padding: EdgeInsets.only(bottom: 10),
-                                                          child: Text(
-                                                            '(${schedule['email_cc']})',
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight: FontWeight.w700,
-                                                              color: Colors.indigo[400],
-                                                            ),
+                                                        SizedBox(height: 3.5,),
+                                                        Text(
+                                                          selectedTime != null
+                                                              ? '${schedule['time']}' : selectedTime != null
+                                                              ? '${selectedTime!.format(context)}' : schedule['time'],
+                                                          style: TextStyle(
+                                                            fontSize: 17,
+                                                            fontWeight: FontWeight.w500,
+                                                            color: Colors.grey[800],
                                                           ),
                                                         ),
-                                                        trailing: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            IconButton(
-                                                              icon: Icon(
-                                                                size: 20,
-                                                                FontAwesomeIcons.edit,
-                                                                color: Colors.black87,
-                                                              ),
-                                                              onPressed: () {
-                                                                editSchedule(schedule);
-                                                              },
-                                                            ),
-                                                            IconButton(
-                                                              icon: Icon(
-                                                                size: 20,
-                                                                FontAwesomeIcons.trashCan,
-                                                                color: Colors.black87,
-                                                              ),
-                                                              onPressed: () {
-                                                                showDialog(
-                                                                  context: context,
-                                                                  builder: (context) => AlertDialog(
-                                                                    shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.circular(18),
-                                                                    ),
-                                                                    title: Text(
-                                                                      "Are you sure you want to delete the data?",
-                                                                      style: TextStyle(
-                                                                        color: Colors.black,
-                                                                        fontSize: 16,
-                                                                        fontWeight: FontWeight.w500,
-                                                                      ),
-                                                                    ),
-                                                                    actions: [
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          setState(() {
-                                                                            deleteSchedule(schedule['id']);
-                                                                          });
-                                                                          Navigator.of(context).pop();
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                                            const SnackBar(
-                                                                              backgroundColor: Colors.indigo,
-                                                                              content: Text(
-                                                                                "Data has been deleted successfully!",
-                                                                                style: TextStyle(
-                                                                                  fontWeight: FontWeight.w400,
-                                                                                  fontSize: 15,
-                                                                                  color: Colors.white,
-                                                                                ),
-                                                                                textAlign: TextAlign.center,
-                                                                              ),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                        child: Text(
-                                                                          'Yes',
-                                                                          style: TextStyle(
-                                                                            color: Colors.indigo,
-                                                                            fontWeight: FontWeight.w600,
-                                                                            fontSize: 16,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          Navigator.of(context).pop();
-                                                                        },
-                                                                        child: Text(
-                                                                          'No',
-                                                                          style: TextStyle(
-                                                                            color: Colors.indigo,
-                                                                            fontWeight: FontWeight.w600,
-                                                                            fontSize: 16,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ],
+                                                      ],
+                                                    ),
+                                                    title: Container(
+                                                      padding: const EdgeInsets.only(bottom: 10),
+                                                      alignment: Alignment.topLeft,
+                                                      child: Text(
+                                                        schedule['doc_name'],
+                                                        style: TextStyle(
+                                                          fontSize: 19.5,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: Colors.black87,
                                                         ),
                                                       ),
                                                     ),
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          );
+                                                    subtitle: Container(
+                                                      padding: EdgeInsets.only(bottom: 10),
+                                                      child: Text(
+                                                        '(${schedule['email_cc']})',
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: Colors.indigo[400],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    trailing: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        IconButton(
+                                                          icon: Icon(
+                                                            size: 20,
+                                                            FontAwesomeIcons.penToSquare,
+                                                            color: Colors.black87,
+                                                          ),
+                                                          onPressed: () {
+                                                            editSchedule(schedule);
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Icon(
+                                                            size: 20,
+                                                            FontAwesomeIcons.trashCan,
+                                                            color: Colors.black87,
+                                                          ),
+                                                          onPressed: () {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (context) => AlertDialog(
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(18),
+                                                                ),
+                                                                title: Text(
+                                                                  "Are you sure you want to delete the data?",
+                                                                  style: TextStyle(
+                                                                    color: Colors.black,
+                                                                    fontSize: 16,
+                                                                    fontWeight: FontWeight.w500,
+                                                                  ),
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      setState(() {
+                                                                        deleteSchedule(schedule['id']);
+                                                                      });
+                                                                      Navigator.of(context).pop();
+                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                        const SnackBar(
+                                                                          backgroundColor: Colors.indigo,
+                                                                          content: Text(
+                                                                            "Data has been deleted successfully!",
+                                                                            style: TextStyle(
+                                                                              fontWeight: FontWeight.w400,
+                                                                              fontSize: 15,
+                                                                              color: Colors.white,
+                                                                            ),
+                                                                            textAlign: TextAlign.center,
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                    child: Text(
+                                                                      'Yes',
+                                                                      style: TextStyle(
+                                                                        color: Colors.indigo,
+                                                                        fontWeight: FontWeight.w600,
+                                                                        fontSize: 16,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      Navigator.of(context).pop();
+                                                                    },
+                                                                    child: Text(
+                                                                      'No',
+                                                                      style: TextStyle(
+                                                                        color: Colors.indigo,
+                                                                        fontWeight: FontWeight.w600,
+                                                                        fontSize: 16,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       }
                                       else{
                                         return Container(
@@ -1095,8 +1082,8 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                           height: 47,
                           child: ElevatedButton(
                             onPressed: () {
-                              dateIsValid = selectedDate != null;
-                              timeIsValid = selectedTime != null;
+                              dateIsValid = selectedDate!=null;
+                              timeIsValid = selectedTime!=null;
                               docNameIsValid = docNameController.text.isNotEmpty;
                               emailCCIsValid = emailCCController.text.isNotEmpty;
                               if (dateIsValid && timeIsValid && docNameIsValid && emailCCIsValid) {
@@ -1182,13 +1169,26 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                             return GridView.builder(
                                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                                 crossAxisCount: 2,
-                                                childAspectRatio: 4.6,
+                                                childAspectRatio: 3,
                                               ),
                                               itemCount: (schedules.length < 6) ? schedules.length : 6,
                                               itemBuilder: (context, index) {
                                                 final schedule = schedules[index];
                                                 return Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
+                                                    Container(
+                                                      padding: EdgeInsets.only(left: 10),
+                                                      child: Text('${schedule['date'].toString().substring(2,10)}',
+                                                        style: TextStyle(
+                                                          fontSize: 17,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Colors.grey[800],
+                                                        ),
+
+                                                      ),
+                                                    ),
                                                     ListTile(
                                                       leading: Text(
                                                         selectedTime != null
@@ -1197,28 +1197,33 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                             ? '${selectedTime!.format(context)}'
                                                             : schedule['time'],
                                                         style: TextStyle(
-                                                          fontSize: 17,
+                                                          fontSize: 18,
                                                           fontWeight: FontWeight.w500,
-                                                          color: Colors.black,
+                                                          color: Colors.grey[800],
                                                         ),
                                                       ),
-                                                      title: Text(
-                                                        schedule['doc_name'],
-                                                        style: TextStyle(
-                                                          fontSize: 19,
-                                                          fontWeight: FontWeight.w700,
-                                                          color: Colors.black,
-                                                        ),
+                                                      title: Container(
+                                                        padding: const EdgeInsets.only(left: 18),
+                                                        child: Text(
+                                                              schedule['doc_name'],
+                                                              style: TextStyle(
+                                                                fontSize: 21,
+                                                                fontWeight: FontWeight.w700,
+                                                                color: Colors.black87,
+                                                              ),
+                                                            ),
                                                       ),
+
                                                       subtitle: Container(
-                                                        padding: EdgeInsets.only(top: 4),
+                                                        padding: const EdgeInsets.only(top: 4, left: 18),
                                                         child: Text(
                                                           '(${schedule['email_cc']})',
                                                           style: TextStyle(
-                                                            fontSize: 14,
+                                                            fontSize: 15,
                                                             fontWeight: FontWeight.w700,
                                                             color: Colors.indigo[400],
                                                           ),
+                                                          textAlign: TextAlign.justify,
                                                         ),
                                                       ),
                                                       trailing: Row(
@@ -1226,7 +1231,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                         children: [
                                                           IconButton(
                                                             icon: Icon(
-                                                              FontAwesomeIcons.edit,
+                                                              FontAwesomeIcons.penToSquare,
                                                               color: Colors.black87,
                                                             ),
                                                             onPressed: () {
@@ -1313,36 +1318,61 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                             return GridView.builder(
                                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                                 crossAxisCount: 2,
-                                                childAspectRatio: 4.6,
+                                                childAspectRatio: 3,
                                               ),
                                               itemCount: (schedules.length-6).clamp(0, schedules.length-6),
                                               itemBuilder: (context, index) {
                                                 final schedule = schedules[index+6];
                                                 return Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    ListTile(
-                                                      leading: Text(selectedTime != null ? '${schedule['time']}' : (selectedTime != null
-                                                            ? '${selectedTime!.format(context)}' : schedule['time']),
+                                                    Container(
+                                                      padding: EdgeInsets.only(left: 10),
+                                                      child: Text('${schedule['date'].toString().substring(2,10)}',
                                                         style: TextStyle(
                                                           fontSize: 17,
                                                           fontWeight: FontWeight.w500,
-                                                          color: Colors.black,
+                                                          color: Colors.grey[800],
                                                         ),
+
                                                       ),
-                                                      title: Text(
-                                                        schedule['doc_name'],
+                                                    ),
+                                                    ListTile(
+                                                      leading: Text(
+                                                        selectedTime != null
+                                                            ? '${schedule['time']}'
+                                                            : selectedTime != null
+                                                            ? '${selectedTime!.format(context)}'
+                                                            : schedule['time'],
                                                         style: TextStyle(
-                                                          fontSize: 19,
+                                                          fontSize: 18,
                                                           fontWeight: FontWeight.w500,
-                                                          color: Colors.black,
+                                                          color: Colors.grey[800],
                                                         ),
                                                       ),
-                                                      subtitle: Text(
-                                                        schedule['email_cc'],
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                          fontWeight: FontWeight.w600,
-                                                          color: Colors.indigo[400],
+                                                      title: Container(
+                                                        padding: const EdgeInsets.only(left: 18),
+                                                        child: Text(
+                                                          schedule['doc_name'],
+                                                          style: TextStyle(
+                                                            fontSize: 21,
+                                                            fontWeight: FontWeight.w700,
+                                                            color: Colors.black87,
+                                                          ),
+                                                        ),
+                                                      ),
+
+                                                      subtitle: Container(
+                                                        padding: const EdgeInsets.only(top: 4, left: 18),
+                                                        child: Text(
+                                                          '(${schedule['email_cc']})',
+                                                          style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight: FontWeight.w700,
+                                                            color: Colors.indigo[400],
+                                                          ),
+                                                          textAlign: TextAlign.justify,
                                                         ),
                                                       ),
                                                       trailing: Row(
@@ -1350,7 +1380,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                         children: [
                                                           IconButton(
                                                             icon: Icon(
-                                                              FontAwesomeIcons.edit,
+                                                              FontAwesomeIcons.penToSquare,
                                                               color: Colors.black87,
                                                             ),
                                                             onPressed: () {
@@ -1391,7 +1421,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                                               "Data has been deleted successfully!",
                                                                               style: TextStyle(
                                                                                 fontWeight: FontWeight.w400,
-                                                                                fontSize: 15,
+                                                                                fontSize: 18,
                                                                                 color: Colors.white,
                                                                               ),
                                                                               textAlign: TextAlign.center,
@@ -1684,8 +1714,8 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                           height: 47,
                           child: ElevatedButton(
                             onPressed: () {
-                              dateIsValid = selectedDate != null;
-                              timeIsValid = selectedTime != null;
+                              dateIsValid = selectedDate!=null;
+                              timeIsValid = selectedTime!=null;
                               docNameIsValid = docNameController.text.isNotEmpty;
                               emailCCIsValid = emailCCController.text.isNotEmpty;
                               if (dateIsValid && timeIsValid && docNameIsValid && emailCCIsValid) {
@@ -1771,13 +1801,26 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                         return GridView.builder(
                                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                             crossAxisCount: 2,
-                                            childAspectRatio: 2,
+                                            childAspectRatio: 3,
                                           ),
                                           itemCount: (schedules.length < 6) ? schedules.length : 6,
                                           itemBuilder: (context, index) {
                                             final schedule = schedules[index];
                                             return Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(left: 10),
+                                                  child: Text('${schedule['date'].toString().substring(2,10)}',
+                                                    style: TextStyle(
+                                                      fontSize: 17,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.grey[800],
+                                                    ),
+
+                                                  ),
+                                                ),
                                                 ListTile(
                                                   leading: Text(
                                                     selectedTime != null
@@ -1786,28 +1829,33 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                         ? '${selectedTime!.format(context)}'
                                                         : schedule['time'],
                                                     style: TextStyle(
-                                                      fontSize: 17,
+                                                      fontSize: 18,
                                                       fontWeight: FontWeight.w500,
-                                                      color: Colors.black,
+                                                      color: Colors.grey[800],
                                                     ),
                                                   ),
-                                                  title: Text(
-                                                    schedule['doc_name'],
-                                                    style: TextStyle(
-                                                      fontSize: 19,
-                                                      fontWeight: FontWeight.w700,
-                                                      color: Colors.black,
+                                                  title: Container(
+                                                    padding: const EdgeInsets.only(left: 18),
+                                                    child: Text(
+                                                      schedule['doc_name'],
+                                                      style: TextStyle(
+                                                        fontSize: 21,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Colors.black87,
+                                                      ),
                                                     ),
                                                   ),
+
                                                   subtitle: Container(
-                                                    padding: EdgeInsets.only(top: 4),
+                                                    padding: const EdgeInsets.only(top: 4, left: 18),
                                                     child: Text(
                                                       '(${schedule['email_cc']})',
                                                       style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: 15,
                                                         fontWeight: FontWeight.w700,
                                                         color: Colors.indigo[400],
                                                       ),
+                                                      textAlign: TextAlign.justify,
                                                     ),
                                                   ),
                                                   trailing: Row(
@@ -1815,7 +1863,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                     children: [
                                                       IconButton(
                                                         icon: Icon(
-                                                          FontAwesomeIcons.edit,
+                                                          FontAwesomeIcons.penToSquare,
                                                           color: Colors.black87,
                                                         ),
                                                         onPressed: () {
@@ -1902,36 +1950,61 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                         return GridView.builder(
                                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                             crossAxisCount: 2,
-                                            childAspectRatio: 5,
+                                            childAspectRatio: 3,
                                           ),
                                           itemCount: (schedules.length-6).clamp(0, schedules.length-6),
                                           itemBuilder: (context, index) {
                                             final schedule = schedules[index+6];
                                             return Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                ListTile(
-                                                  leading: Text(selectedTime != null ? '${schedule['time']}' : (selectedTime != null
-                                                      ? '${selectedTime!.format(context)}' : schedule['time']),
+                                                Container(
+                                                  padding: EdgeInsets.only(left: 10),
+                                                  child: Text('${schedule['date'].toString().substring(2,10)}',
                                                     style: TextStyle(
                                                       fontSize: 17,
                                                       fontWeight: FontWeight.w500,
-                                                      color: Colors.black,
+                                                      color: Colors.grey[800],
                                                     ),
+
                                                   ),
-                                                  title: Text(
-                                                    schedule['doc_name'],
+                                                ),
+                                                ListTile(
+                                                  leading: Text(
+                                                    selectedTime != null
+                                                        ? '${schedule['time']}'
+                                                        : selectedTime != null
+                                                        ? '${selectedTime!.format(context)}'
+                                                        : schedule['time'],
                                                     style: TextStyle(
-                                                      fontSize: 19,
+                                                      fontSize: 18,
                                                       fontWeight: FontWeight.w500,
-                                                      color: Colors.black,
+                                                      color: Colors.grey[800],
                                                     ),
                                                   ),
-                                                  subtitle: Text(
-                                                    schedule['email_cc'],
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Colors.indigo[400],
+                                                  title: Container(
+                                                    padding: const EdgeInsets.only(left: 18),
+                                                    child: Text(
+                                                      schedule['doc_name'],
+                                                      style: TextStyle(
+                                                        fontSize: 21,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Colors.black87,
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                  subtitle: Container(
+                                                    padding: const EdgeInsets.only(top: 4, left: 18),
+                                                    child: Text(
+                                                      '(${schedule['email_cc']})',
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Colors.indigo[400],
+                                                      ),
+                                                      textAlign: TextAlign.justify,
                                                     ),
                                                   ),
                                                   trailing: Row(
@@ -1939,7 +2012,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                     children: [
                                                       IconButton(
                                                         icon: Icon(
-                                                          FontAwesomeIcons.edit,
+                                                          FontAwesomeIcons.penToSquare,
                                                           color: Colors.black87,
                                                         ),
                                                         onPressed: () {
@@ -1980,7 +2053,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                                           "Data has been deleted successfully!",
                                                                           style: TextStyle(
                                                                             fontWeight: FontWeight.w400,
-                                                                            fontSize: 15,
+                                                                            fontSize: 18,
                                                                             color: Colors.white,
                                                                           ),
                                                                           textAlign: TextAlign.center,
