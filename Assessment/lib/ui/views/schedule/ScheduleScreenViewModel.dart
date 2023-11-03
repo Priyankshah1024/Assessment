@@ -262,6 +262,21 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                     fetchData();
 
                     Navigator.of(context).pop(updatedSchedule);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.indigo,
+                        content: Text(
+                          "Data has been edited successfully!",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Save', style: TextStyle(fontSize: 18)),
                 ),
@@ -544,7 +559,6 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                           ),
                         ),
                       ),
-
                     ],
                   ),
 
@@ -590,6 +604,21 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                               emailCCIsValid = emailCCController.text.isNotEmpty;
                               if (dateIsValid && timeIsValid && docNameIsValid && emailCCIsValid) {
                                     createSchedule();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        backgroundColor: Colors.indigo,
+                                        content: Text(
+                                          "Data has been uploaded successfully!",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -1070,6 +1099,20 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                               emailCCIsValid = emailCCController.text.isNotEmpty;
                               if (dateIsValid && timeIsValid && docNameIsValid && emailCCIsValid) {
                                 createSchedule();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    backgroundColor: Colors.indigo,
+                                    content: Text(
+                                      "Data has been uploaded successfully!",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -1222,7 +1265,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                                               "Data has been deleted successfully!",
                                                                               style: TextStyle(
                                                                                 fontWeight: FontWeight.w400,
-                                                                                fontSize: 15,
+                                                                                fontSize: 18,
                                                                                 color: Colors.white,
                                                                               ),
                                                                               textAlign: TextAlign.center,
@@ -1560,7 +1603,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
 
                   Row(
                     children: [
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Flexible(
                         flex: 3,
                         child: TextFormField(
@@ -1645,6 +1688,20 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                               emailCCIsValid = emailCCController.text.isNotEmpty;
                               if (dateIsValid && timeIsValid && docNameIsValid && emailCCIsValid) {
                                 createSchedule();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    backgroundColor: Colors.indigo,
+                                    content: Text(
+                                      "Data has been uploaded successfully!",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -1797,7 +1854,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                                           "Data has been deleted successfully!",
                                                                           style: TextStyle(
                                                                             fontWeight: FontWeight.w400,
-                                                                            fontSize: 15,
+                                                                            fontSize: 18,
                                                                             color: Colors.white,
                                                                           ),
                                                                           textAlign: TextAlign.center,
