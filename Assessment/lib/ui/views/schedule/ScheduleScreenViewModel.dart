@@ -378,7 +378,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
               final isTablet=constraints.maxWidth>=600 && constraints.maxWidth<1024;
               return isMobile
                   ? Column(
-                children: [
+                  children: [
                   Align(
                     alignment: Alignment.topLeft,
                     child: Text(
@@ -632,9 +632,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                           child: FutureBuilder(
                             future: fetchData(),
                             builder: (BuildContext context, snapshot){
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return Center(child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
+                              if (snapshot.hasError) {
                                 print("${snapshot.error}");
                                 return Center(child: Text('Something went wrong!', style: TextStyle(fontSize: 21, color: Colors.grey[600], fontWeight: FontWeight.w500),));
                               }
@@ -691,7 +689,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                           ],
                                                         ),
                                                         title: Container(
-                                                          padding: EdgeInsets.only(bottom: 10),
+                                                          padding: const EdgeInsets.only(bottom: 10),
                                                           alignment: Alignment.topLeft,
                                                           child: Text(
                                                             schedule['doc_name'],
@@ -703,7 +701,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                           ),
                                                         ),
                                                         subtitle: Container(
-                                                          padding: EdgeInsets.only(top: 4),
+                                                          padding: EdgeInsets.only(bottom: 10),
                                                           child: Text(
                                                             '(${schedule['email_cc']})',
                                                             style: TextStyle(
@@ -1242,9 +1240,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                             child: FutureBuilder(
                               future: fetchData(),
                               builder: (BuildContext context, snapshot){
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return Center(child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
+                                if (snapshot.hasError) {
                                   print("${snapshot.error}");
                                   return Center(child: Text('Something went wrong!', style: TextStyle(fontSize: 27, color: Colors.grey[600], fontWeight: FontWeight.w500),));
                                 }
@@ -1819,9 +1815,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                             child: FutureBuilder(
                               future: fetchData(),
                               builder: (BuildContext context, snapshot){
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return Center(child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
+                                if (snapshot.hasError) {
                                   print("${snapshot.error}");
                                   return Center(child: Text('Something went wrong!', style: TextStyle(fontSize: 27, color: Colors.grey[600], fontWeight: FontWeight.w500),));
                                 }
