@@ -3,9 +3,9 @@ Schedule App
 
 Mobile View Output Video:
 
-https://github.com/Priyankshah1024/Assessment/assets/118287221/35f413bd-bc72-43dd-be27-33897efa79af
+https://github.com/Priyankshah1024/Assessment/assets/118287221/e3aa38e0-f249-47d3-b5db-0b2f18338191
 
-<hr>
+<hr/>
 
 Tablet View Output Video:
 
