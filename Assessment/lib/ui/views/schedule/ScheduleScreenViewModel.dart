@@ -153,19 +153,18 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
-                            // title: Text('Selected Date'),
-                            title: Text('You have selected the date: ${dateController.text}'),
+                            title: Text('Selected Date'),
+                            content: Text('You have selected the date: ${selectedDate.toString().substring(0, 10)}'),
                             actions: <Widget>[
                               ElevatedButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop(); // Close the dialog
                                 },
-                                child: Text('OK', style: TextStyle(
-                                  fontSize: 17,
-                                ),
+                                child: Text('Save', style: TextStyle(fontSize: 17)),
                               ),
+                            ],
                           ),
-                        ]));
+                        );
 
                       },
                       child: const Text('Select Date'),
@@ -186,25 +185,26 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                             timeController.text = selected.format(context);
                           });
                         }
+
                         showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                // title: Text('Selected Date'),
-                                title: Text('You have selected the time: ${timeController.text}'),
-                                actions: <Widget>[
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text('OK', style: TextStyle(
-                                      fontSize: 17,
-                                    ),
-                                    ),
-                                  ),
-                                ]));
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            title: Text('Selected Date'),
+                            content: Text('You have selected the time: ${selectedTime!.format(context)}'),
+                            actions: <Widget>[
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Save', style: TextStyle(fontSize: 17)),
+                              ),
+                            ],
+                          ),
+                        );
+
                       },
                       child: const Text('Select Time'),
                     ),
@@ -614,7 +614,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                     ],
                   ),
 
-                  SizedBox(height: 20),
+                  SizedBox(height: 25),
 
                   Align(
                     alignment: Alignment.topLeft,
@@ -627,6 +627,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
 
                   Expanded(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Expanded(
                           child: FutureBuilder(
@@ -643,24 +644,32 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                 );
                               }
                               else{
-                                return
-                                  PageView.builder(
+                                return PageView.builder(
+                                    scrollDirection: Axis.horizontal,
                                     controller: _pageController,
-                                    itemCount: schedules.isNotEmpty?schedules.length:1,
+                                    itemCount: (schedules.length/3).ceil(),
                                     itemBuilder: (context, pageIndex) {
-                                      if (pageIndex == 0 && schedules.isNotEmpty) {
+                                      final startIndex = pageIndex*3;
+                                      final endIndex = (startIndex+3 < schedules.length) ? startIndex+3 : schedules.length;
+                                      if (pageIndex<schedules.length && schedules.isNotEmpty) {
                                         return CupertinoScrollbar(
                                             controller: _scrollController,
                                             thickness: 10,
                                             radius: Radius.circular(10),
                                             thicknessWhileDragging: 4,
                                             radiusWhileDragging: Radius.circular(20),
-                                            child: ListView.builder(
+                                            child: GridView.builder(
+                                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 1,
+                                                childAspectRatio: 3.9,
+                                              ),
                                               controller: _scrollController,
-                                              itemCount: (schedules.length<6)?schedules.length:6,
+                                              itemCount: endIndex-startIndex,
                                               itemBuilder: (context, index) {
-                                                final schedule = schedules[index];
+                                                final schedule = schedules[startIndex+index];
                                                 return Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     SingleChildScrollView(
                                                       child: ListTile(
@@ -672,7 +681,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                                 style: TextStyle(
                                                                 fontSize: 17,
                                                                 fontWeight: FontWeight.w500,
-                                                                color: Colors.black,
+                                                                color: Colors.grey[800],
                                                               ),
                                                             ),
                                                             SizedBox(height: 3.5,),
@@ -683,7 +692,7 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                                               style: TextStyle(
                                                                 fontSize: 17,
                                                                 fontWeight: FontWeight.w500,
-                                                                color: Colors.black,
+                                                                color: Colors.grey[800],
                                                               ),
                                                             ),
                                                           ],
@@ -803,173 +812,42 @@ class _ScheduleScreenViewModelState extends State<ScheduleScreenViewModel> {
                                               },
                                             ),
                                           );
-                                      } else if (pageIndex==1 && schedules.length>6) {
-                                          return CupertinoScrollbar(
-                                            controller: _scrollController,
-                                            thickness: 10,
-                                            radius: Radius.circular(10),
-                                            thicknessWhileDragging: 4,
-                                            radiusWhileDragging: Radius.circular(20),
-                                            child: ListView.builder(
-                                              controller: _scrollController,
-                                              itemCount: (schedules.length<6)?schedules.length:6,
-                                              itemBuilder: (context, index) {
-                                                final schedule = schedules[index];
-                                                return Column(
-                                                  children: [
-                                                    SingleChildScrollView(
-                                                      child: ListTile(
-                                                        leading: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Text('${schedule['date'].toString().substring(2,10)}',
-                                                              style: TextStyle(
-                                                                fontSize: 17,
-                                                                fontWeight: FontWeight.w500,
-                                                                color: Colors.black,
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 3.5,),
-                                                            Text(
-                                                              selectedTime != null ? '${schedule['time']}' : selectedTime != null
-                                                                  ? '${selectedTime!.format(context)}' : schedule['time'],
-                                                              style: TextStyle(
-                                                                fontSize: 17,
-                                                                fontWeight: FontWeight.w500,
-                                                                color: Colors.black,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        title: Container(
-                                                          padding: EdgeInsets.only(bottom: 10),
-                                                          alignment: Alignment.topLeft,
-                                                          child: Text(
-                                                            schedule['doc_name'],
-                                                            style: TextStyle(
-                                                              fontSize: 19.5,
-                                                              fontWeight: FontWeight.w700,
-                                                              color: Colors.black87,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        subtitle: Container(
-                                                          padding: EdgeInsets.only(top: 4),
-                                                          child: Text(
-                                                            '(${schedule['email_cc']})',
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight: FontWeight.w700,
-                                                              color: Colors.indigo[400],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        trailing: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            IconButton(
-                                                              icon: Icon(
-                                                                size: 20,
-                                                                FontAwesomeIcons.edit,
-                                                                color: Colors.black87,
-                                                              ),
-                                                              onPressed: () {
-                                                                editSchedule(schedule);
-                                                              },
-                                                            ),
-                                                            IconButton(
-                                                              icon: Icon(
-                                                                size: 20,
-                                                                FontAwesomeIcons.trashCan,
-                                                                color: Colors.black87,
-                                                              ),
-                                                              onPressed: () {
-                                                                showDialog(
-                                                                  context: context,
-                                                                  builder: (context) => AlertDialog(
-                                                                    shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.circular(18),
-                                                                    ),
-                                                                    title: Text(
-                                                                      "Are you sure you want to delete the data?",
-                                                                      style: TextStyle(
-                                                                        color: Colors.black,
-                                                                        fontSize: 16,
-                                                                        fontWeight: FontWeight.w500,
-                                                                      ),
-                                                                    ),
-                                                                    actions: [
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          setState(() {
-                                                                            deleteSchedule(schedule['id']);
-                                                                          });
-                                                                          Navigator.of(context).pop();
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                                            const SnackBar(
-                                                                              backgroundColor: Colors.indigo,
-                                                                              content: Text(
-                                                                                "Data has been deleted successfully!",
-                                                                                style: TextStyle(
-                                                                                  fontWeight: FontWeight.w400,
-                                                                                  fontSize: 15,
-                                                                                  color: Colors.white,
-                                                                                ),
-                                                                                textAlign: TextAlign.center,
-                                                                              ),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                        child: Text(
-                                                                          'Yes',
-                                                                          style: TextStyle(
-                                                                            color: Colors.indigo,
-                                                                            fontWeight: FontWeight.w600,
-                                                                            fontSize: 16,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          Navigator.of(context).pop();
-                                                                        },
-                                                                        child: Text(
-                                                                          'No',
-                                                                          style: TextStyle(
-                                                                            color: Colors.indigo,
-                                                                            fontWeight: FontWeight.w600,
-                                                                            fontSize: 16,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          );
-                                      } else {
+                                      }
+                                      else{
                                         return Container(
                                           alignment: Alignment.center,
                                           child: Text("No Data", style: TextStyle(fontSize: 19, color: Colors.grey[500])),
                                         );
-                                    }
+                                      }
                                   },
                                 );
                               }
                             },
                           )
-
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: () {
+                                _pageController.previousPage(
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.ease,
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.arrow_forward),
+                              onPressed: () {
+                                _pageController.nextPage(
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.ease,
+                                );
+                              },
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   )

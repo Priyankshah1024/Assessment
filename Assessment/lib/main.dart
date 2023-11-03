@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Schedule App',
       theme: ThemeData(
-        highlightColor: Color(0xffffc600),
+        highlightColor: Colors.indigo[200],
         primarySwatch: Colors.indigo,
       ),
       navigatorKey: StackedService.navigatorKey,
